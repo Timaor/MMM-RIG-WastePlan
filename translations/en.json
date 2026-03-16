@@ -1,12 +1,13 @@
 {
   "LOADING": "Loading",
-  "NO_DATA": "No upcoming collections found",
+  "TODAY": "today",
   "DAY": "day",
   "DAYS": "days",
-  "TODAY": "today",
-  "ERROR": "Could not fetch waste calendar",
-  "ADDRESS_NOT_FOUND": "Address not found",
-  "MISSING_ADDRESS": "Missing address in config",
-  "UNKNOWN_FRACTION": "Unknown fraction",
-  "PICKUP": "Collection"
+  "NO_DATA": "No upcoming waste pickups found",
+  "UNKNOWN_FRACTION": "Unknown waste type",
+  "PICKUP": "Pickup",
+  "UPDATED": "Updated:",
+  "MISSING_ADDRESS": "Add an address or resolved address fields in config.js",
+  "ADDRESS_NOT_FOUND": "Address not found. Check the spelling.",
+  "ERROR": "Could not fetch the waste plan right now"
 }

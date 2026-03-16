@@ -1,44 +1,32 @@
 # MMM-RIG-WastePlan
 
-MagicMirror² module for showing upcoming waste pickup dates from providers using the **Min Renovasjon** backend, including **RiG**.
+MagicMirror² module for waste pickup calendars from RiG and other **Min Renovasjon** style municipalities.
 
-This module is community-made and is **not** affiliated with RiG, Norkart, or Min Renovasjon.
+This version adds:
+- Norwegian and English translations
+- built-in icon mapping for common waste fractions
+- support for RiG and other municipalities using the same Min Renovasjon backend pattern
+- simple in-memory cache to avoid hammering the API
+- optional pre-resolved address fields when you want to skip address lookup
 
-## What it does
-
-- Lets you use a normal address in `config.js`
-- Looks up the address automatically with Geonorge
-- Fetches pickup dates from the Min Renovasjon backend
-- Shows upcoming collections in a simple list
-
-## Installation
-
-Go to your MagicMirror modules folder and copy the module in place:
+## Install
 
 ```bash
 cd ~/MagicMirror/modules
-cp -r /path/to/MMM-RIG-WastePlan .
+git clone https://github.com/YOURUSER/MMM-RIG-WastePlan.git
+cd MMM-RIG-WastePlan
+npm install
 ```
-
-Or clone/copy the files from this folder into:
-
-```bash
-~/MagicMirror/modules/MMM-RIG-WastePlan
-```
-
-No extra `npm install` step is required.
 
 ## Basic config
-
-Add this to `config/config.js`:
 
 ```js
 {
   module: "MMM-RIG-WastePlan",
   position: "top_left",
   config: {
-    address: "Kverndalsgata 10, 3717 Skien",
-    maxEntries: 5,
+    address: "Vestheimvegen 80, 3919 Porsgrunn",
+    maxEntries: 6,
     showIcon: true,
     showDaysLeft: true,
     dateFormat: "ddd D. MMM"
@@ -46,49 +34,50 @@ Add this to `config/config.js`:
 },
 ```
 
-## Alternative config without address lookup
-
-If you already know the address details, you can skip Geonorge lookup:
+## Faster config without address lookup
 
 ```js
 {
   module: "MMM-RIG-WastePlan",
   position: "top_left",
   config: {
-    streetName: "Kverndalsgata",
-    houseNumber: "10",
-    addressCode: "12345",
-    municipalityId: "4003"
+    streetName: "Vestheimvegen",
+    houseNumber: "80",
+    addressCode: "5225",
+    municipalityId: "4001",
+    maxEntries: 6,
+    showIcon: true
   }
 },
 ```
 
-## Config options
+## Options
 
-| Option | Description | Default |
-|---|---|---|
-| `header` | Header text | `Tømmeplan` |
-| `address` | Free-text address lookup, e.g. `Gate 1, 3717 Skien` | `""` |
-| `streetName` | Street name, used if you want to skip lookup | `""` |
-| `houseNumber` | House number | `""` |
-| `addressCode` | Geonorge `adressekode` | `""` |
-| `municipalityId` | Geonorge `kommunenummer` | `""` |
-| `maxEntries` | How many future pickups to show | `6` |
-| `showDate` | Show formatted date | `true` |
-| `dateFormat` | Moment format for the date | `ddd D. MMM` |
-| `showDaysLeft` | Show days left until pickup | `true` |
-| `showFraction` | Show waste fraction name | `true` |
-| `showIcon` | Show icon if available, otherwise emoji fallback | `false` |
-| `minWidth` | Minimum width in px | `220` |
-| `updateInterval` | Refresh interval in ms | `21600000` |
-| `requestTimeout` | Request timeout in ms | `10000` |
+| Option | Default | Description |
+|---|---:|---|
+| `header` | `"Tømmeplan"` | Header text |
+| `address` | `""` | Full address used for Geonorge lookup |
+| `streetName` | `""` | Street name if you want to skip address lookup |
+| `houseNumber` | `""` | House number, optionally with letter |
+| `addressCode` | `""` | Geonorge `adressekode` |
+| `municipalityId` | `""` | Geonorge `kommunenummer` |
+| `maxEntries` | `6` | Number of upcoming entries to show |
+| `showDate` | `true` | Show formatted pickup date |
+| `dateFormat` | `"ddd D. MMM"` | Moment date format |
+| `showDaysLeft` | `true` | Show days until pickup |
+| `showFraction` | `true` | Show waste fraction name |
+| `showIcon` | `true` | Show built-in icons / emoji fallback |
+| `showMunicipality` | `false` | Show municipality name under the address |
+| `minWidth` | `240` | Minimum width in pixels |
+| `updateInterval` | `21600000` | Refresh interval in ms |
+| `requestTimeout` | `10000` | Request timeout in ms |
+| `retryDelay` | `60000` | Retry delay after errors |
+| `cacheMaxAge` | `43200000` | Helper-side cache lifetime |
 
 ## Notes
 
-- This module depends on the public address lookup from Geonorge and the Min Renovasjon backend used by community integrations.
-- If RiG or Min Renovasjon changes their backend/API behavior, the module may need updates.
-- If your address returns multiple close matches, use the full address including postcode.
+- RiG tells users to use the **Min Renovasjon** app and online calendar for pickup days.
+- RiG also notes that pickup days can change around holidays, so the module fetches live upcoming dates instead of relying on printed calendars.
+- Waste fractions in Grenland include restavfall, matavfall, glass- og metallemballasje, papp/papir and plastemballasje, which is what the built-in icon mapping is optimized for.
 
-## License
-
-MIT
+If your municipality uses the same backend but returns slightly different fraction names, you can extend `iconDataForFraction()` in `node_helper.js`.

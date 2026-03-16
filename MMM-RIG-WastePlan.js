@@ -1,14 +1,13 @@
 /* MagicMirror²
  * Module: MMM-RIG-WastePlan
  *
- * Community-made module for Min Renovasjon / RiG style waste calendars.
- * Not affiliated with RiG, Norkart, or Min Renovasjon.
+ * Waste pickup calendar for RiG and other Min Renovasjon style municipalities.
  */
 
 Module.register("MMM-RIG-WastePlan", {
   defaults: {
     header: "Tømmeplan",
-    address: "", // e.g. "Kverndalsgata 10, 3717 Skien"
+    address: "",
     streetName: "",
     houseNumber: "",
     addressCode: "",
@@ -18,17 +17,25 @@ Module.register("MMM-RIG-WastePlan", {
     dateFormat: "ddd D. MMM",
     showDaysLeft: true,
     showFraction: true,
-    showIcon: false,
-    minWidth: 220,
-    updateInterval: 6 * 60 * 60 * 1000, // 6 hours
-    requestTimeout: 10000
+    showIcon: true,
+    showMunicipality: false,
+    showLegend: false,
+    minWidth: 240,
+    updateInterval: 6 * 60 * 60 * 1000,
+    requestTimeout: 10000,
+    retryDelay: 60 * 1000,
+    cacheMaxAge: 12 * 60 * 60 * 1000
   },
 
   start: function () {
     this.events = [];
     this.addressLabel = "";
+    this.municipalityName = "";
     this.error = null;
     this.loaded = false;
+    this.lastUpdated = null;
+
+    moment.locale(config.language || "nb");
     this.getWastePlan();
     this.scheduleUpdate();
   },
@@ -44,19 +51,15 @@ Module.register("MMM-RIG-WastePlan", {
   getTranslations: function () {
     return {
       nb: "translations/nb.json",
+      nn: "translations/nb.json",
       en: "translations/en.json"
     };
   },
 
-  scheduleUpdate: function (delay) {
-    let nextLoad = this.config.updateInterval;
-    if (typeof delay !== "undefined" && delay >= 0) {
-      nextLoad = delay;
-    }
-
+  scheduleUpdate: function () {
     setInterval(() => {
       this.getWastePlan();
-    }, nextLoad);
+    }, this.config.updateInterval);
   },
 
   getWastePlan: function () {
@@ -71,8 +74,14 @@ Module.register("MMM-RIG-WastePlan", {
     this.loaded = true;
     this.error = payload && payload.error ? payload.error : null;
     this.addressLabel = payload && payload.addressLabel ? payload.addressLabel : "";
+    this.municipalityName = payload && payload.municipalityName ? payload.municipalityName : "";
     this.events = payload && Array.isArray(payload.events) ? payload.events : [];
+    this.lastUpdated = payload && payload.fetchedAt ? payload.fetchedAt : null;
     this.updateDom(500);
+
+    if (this.error) {
+      setTimeout(() => this.getWastePlan(), this.config.retryDelay);
+    }
   },
 
   formatDaysLeft: function (dateValue) {
@@ -80,7 +89,7 @@ Module.register("MMM-RIG-WastePlan", {
     const pickupDate = moment(dateValue).startOf("day");
     const diff = pickupDate.diff(today, "days");
 
-    if (diff === 0) {
+    if (diff <= 0) {
       return this.translate("TODAY");
     }
     if (diff === 1) {
@@ -111,23 +120,18 @@ Module.register("MMM-RIG-WastePlan", {
       return wrapper;
     }
 
-    if (event.icon && /^(https?:\/\/|data:image\/)/i.test(event.icon)) {
-      const img = document.createElement("img");
-      img.className = "rig-waste-icon-image";
-      img.src = event.icon;
-      img.alt = event.fractionName || "";
-      wrapper.appendChild(img);
+    if (event.iconClass) {
+      const icon = document.createElement("span");
+      icon.className = `rig-waste-fa ${event.iconClass}`;
+      icon.setAttribute("aria-hidden", "true");
+      wrapper.appendChild(icon);
       return wrapper;
     }
 
-    if (event.emoji) {
-      const span = document.createElement("span");
-      span.className = "rig-waste-icon-emoji";
-      span.innerHTML = event.emoji;
-      wrapper.appendChild(span);
-      return wrapper;
-    }
-
+    const span = document.createElement("span");
+    span.className = "rig-waste-icon-emoji";
+    span.innerHTML = event.emoji || "♻️";
+    wrapper.appendChild(span);
     return wrapper;
   },
 
@@ -164,6 +168,13 @@ Module.register("MMM-RIG-WastePlan", {
       wrapper.appendChild(address);
     }
 
+    if (this.config.showMunicipality && this.municipalityName) {
+      const municipality = document.createElement("div");
+      municipality.className = "dimmed xsmall";
+      municipality.innerHTML = this.municipalityName;
+      wrapper.appendChild(municipality);
+    }
+
     if (!this.events.length) {
       const empty = document.createElement("div");
       empty.className = "dimmed light small";
@@ -186,7 +197,9 @@ Module.register("MMM-RIG-WastePlan", {
 
       const title = document.createElement("div");
       title.className = "rig-waste-title";
-      title.innerHTML = this.config.showFraction ? (event.fractionName || this.translate("UNKNOWN_FRACTION")) : this.translate("PICKUP");
+      title.innerHTML = this.config.showFraction
+        ? (event.fractionName || this.translate("UNKNOWN_FRACTION"))
+        : this.translate("PICKUP");
       content.appendChild(title);
 
       const meta = this.buildMetaLine(event);
@@ -202,6 +215,14 @@ Module.register("MMM-RIG-WastePlan", {
     });
 
     wrapper.appendChild(list);
+
+    if (this.lastUpdated) {
+      const updated = document.createElement("div");
+      updated.className = "dimmed xsmall rig-waste-updated";
+      updated.innerHTML = `${this.translate("UPDATED")} ${moment(this.lastUpdated).format("D.M HH:mm")}`;
+      wrapper.appendChild(updated);
+    }
+
     return wrapper;
   }
 });

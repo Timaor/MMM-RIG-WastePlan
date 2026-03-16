@@ -1,7 +1,9 @@
 {
   "name": "mmm-rig-wasteplan",
-  "version": "0.1.0",
-  "description": "MagicMirror module for RiG / Min Renovasjon waste pickup dates",
+  "version": "0.3.0",
+  "description": "MagicMirror module for RiG and other Min Renovasjon style waste calendars",
   "main": "MMM-RIG-WastePlan.js",
-  "license": "MIT"
+  "author": "OpenAI",
+  "license": "MIT",
+  "dependencies": {}
 }
