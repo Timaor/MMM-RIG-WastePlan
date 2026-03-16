@@ -1,0 +1,12 @@
+{
+  "LOADING": "Loading",
+  "NO_DATA": "No upcoming collections found",
+  "DAY": "day",
+  "DAYS": "days",
+  "TODAY": "today",
+  "ERROR": "Could not fetch waste calendar",
+  "ADDRESS_NOT_FOUND": "Address not found",
+  "MISSING_ADDRESS": "Missing address in config",
+  "UNKNOWN_FRACTION": "Unknown fraction",
+  "PICKUP": "Collection"
+}

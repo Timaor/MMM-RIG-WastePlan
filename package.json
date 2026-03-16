@@ -1,0 +1,7 @@
+{
+  "name": "mmm-rig-wasteplan",
+  "version": "0.1.0",
+  "description": "MagicMirror module for RiG / Min Renovasjon waste pickup dates",
+  "main": "MMM-RIG-WastePlan.js",
+  "license": "MIT"
+}

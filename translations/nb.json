@@ -1,0 +1,12 @@
+{
+  "LOADING": "Laster",
+  "NO_DATA": "Ingen kommende tømminger funnet",
+  "DAY": "dag",
+  "DAYS": "dager",
+  "TODAY": "i dag",
+  "ERROR": "Kunne ikke hente tømmekalender",
+  "ADDRESS_NOT_FOUND": "Fant ikke adressen",
+  "MISSING_ADDRESS": "Mangler adresse i config",
+  "UNKNOWN_FRACTION": "Ukjent fraksjon",
+  "PICKUP": "Tømming"
+}
