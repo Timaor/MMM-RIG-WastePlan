@@ -25,7 +25,7 @@ npm install
   module: "MMM-RIG-WastePlan",
   position: "top_left",
   config: {
-    address: "Vestheimvegen 80, 3919 Porsgrunn",
+    address: "DIN ADRESSE, 3946 Porsgrunn",
     maxEntries: 6,
     showIcon: true,
     showDaysLeft: true,
@@ -41,10 +41,10 @@ npm install
   module: "MMM-RIG-WastePlan",
   position: "top_left",
   config: {
-    streetName: "Vestheimvegen",
-    houseNumber: "80",
-    addressCode: "5225",
-    municipalityId: "4001",
+    streetName: "DIN ADRESSE",
+    houseNumber: "HUSNUMMER",
+    addressCode: "5222",
+    municipalityId: "4003",
     maxEntries: 6,
     showIcon: true
   }
